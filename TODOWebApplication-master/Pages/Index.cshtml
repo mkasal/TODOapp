@@ -1,0 +1,144 @@
+﻿@page
+@model TODOWebApplication.Pages.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+
+    string StatusToColor(int status)
+    {
+        return (new[] { "warning", "success", "danger" })[status];
+    }
+}
+
+<style>
+    @@media only screen and (max-width: 600px){
+        .visible-sm {
+            display: none;
+        }
+    } 
+    
+
+</style>
+
+<h1>Index</h1>
+
+<form>
+    <div class="input-group">
+        <input type="text" asp-for="SearchString" placeholder="Search" />
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-search"></i>
+            </button>
+
+            <a type="button" asp-page="./Index" class="btn btn-danger">
+                <i class="fas fa-times"></i>
+            </a>
+        </div>
+    </div>
+</form>
+<p class="my-2">
+    <a asp-page="Create" class="btn btn-primary">Add Item</a>
+</p>
+    
+
+<div class="container-fluid">
+    <div class="sticky-top">
+        <div class="progress">
+            <div class="progress-bar bg-success" style="width:@($"{Model._progress.Completed}%")">Completed</div>
+            <div class="progress-bar bg-warning" style="width:@($"{Model._progress.InProgress}%")">In Progress</div>
+            <div class="progress-bar bg-danger" style="width:@($"{Model._progress.Canceled}%")">Canceled</div>
+        </div>
+
+        <table class="table m-0" style="table-layout:fixed;">
+            <thead class="thead-dark" id="header">
+                <tr>
+                    <th id="test">
+                        @Html.DisplayNameFor(model => model.Tasks[0].Title)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Tasks[0].Description)
+                    </th>
+                    <th class="visible-sm">
+                        @Html.DisplayNameFor(model => model.Tasks[0].AddedDate)
+                    </th>
+                    <th class="visible-sm">
+                        @Html.DisplayNameFor(model => model.Tasks[0].ExpirationDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Tasks[0].Status)
+                    </th>
+                    <th>
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+        </table>
+
+    </div>
+    <table class="table table-striped">
+        <tbody id="body">
+            @foreach (var item in Model.Tasks)
+            {
+                <tr class="table-@StatusToColor((int)item.Status)">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td class="visible-sm">
+                        @Html.DisplayFor(modelItem => item.AddedDate)
+                    </td>
+                    <td class="visible-sm">
+                        @Html.DisplayFor(modelItem => item.ExpirationDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.ID" class="btn btn-outline-warning">
+                            <i class="far fa-edit"></i>
+                        </a>
+                        <a asp-page="./Details" asp-route-id="@item.ID" class="btn btn-outline-primary">
+                            <i class="fas fa-info-circle"></i>
+                        </a>
+                        <a asp-page="./Delete" asp-route-id="@item.ID" class="btn btn-outline-danger">
+                            <i class="fas fa-times-circle"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('td').addClass('align-middle')
+
+            adjustTableHeaderCells();
+
+        });
+
+        $(window).resize(function () {
+            this.adjustTableHeaderCells();
+        });
+
+        function adjustTableHeaderCells() {
+            var headerTh = $("#header tr:first").children();
+            var bodyTd = $("#body tr:first").children();
+
+            console.log($(headerTh)[0] + " : " + $(bodyTd)[0]);
+
+            if (headerTh.length == bodyTd.length) {
+                var i;
+                for (i = 0; i < headerTh.length; i++) {
+                    $(headerTh[i]).width($(bodyTd[i]).width());
+                }
+            }
+        }
+    </script>
+}
+
+
